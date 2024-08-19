@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 import logging
 from telegram import Update
@@ -5,7 +6,6 @@ from telegram.ext import (
     Application, CommandHandler, MessageHandler, filters, ConversationHandler, ContextTypes
 )
 from telegram.error import TelegramError
-import multiprocessing
 
 app = Flask(__name__)
 
@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 # Estados del ConversationHandler
 ASKING_FOR_IMAGE = 1
 
-# Token del bot y ID del canal
-BOT_TOKEN = "7369622624:AAFofO9gKPuChXn0-XVZpV3wv1US_CEQMuI"
-CHANNEL_ID = "@donpolloscrapper_refes"
+# Token del bot y ID del canal desde variables de entorno
+BOT_TOKEN = os.getenv("7369622624:AAFofO9gKPuChXn0-XVZpV3wv1US_CEQMuI")
+CHANNEL_ID = os.getenv("@donpolloscrapper_refes")
 
 # Contador para las referencias
 ref_counter = 1
@@ -91,20 +91,12 @@ conv_handler = ConversationHandler(
 
 application.add_handler(conv_handler)
 
-def run_bot():
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+# Inicia el bot
+application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 @app.route('/')
 def index():
     return 'Bot is running!'
 
-def run_flask():
-    app.run(host='0.0.0.0', port=3000)
-
 if __name__ == "__main__":
-    # Ejecuta el bot en un proceso separado
-    bot_process = multiprocessing.Process(target=run_bot)
-    bot_process.start()
-    
-    # Ejecuta el servidor Flask
-    run_flask()
+    app.run(host='0.0.0.0', port=3000)
